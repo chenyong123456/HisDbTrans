@@ -14,7 +14,7 @@ public interface SqlTaskService {
      * @param sql 用户输入sql
      * @return
      */
-    boolean CheckSqlRight(Db_Connection db_connection,String sql);
+    boolean CheckSqlRight(Db_Connection db_connection,String sql) throws SQLException;
 
     /**
      * 通过sql_task生成定时任务task

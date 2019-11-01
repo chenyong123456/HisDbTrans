@@ -2,8 +2,6 @@ package lyw.demo.pojo;
 
 import lombok.Data;
 
-import java.sql.Connection;
-import java.util.List;
 
 @Data
 public class Sql_Task {

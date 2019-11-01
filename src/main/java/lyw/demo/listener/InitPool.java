@@ -13,6 +13,7 @@ public class InitPool implements ApplicationListener<ContextRefreshedEvent> {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Class.forName("oracle.jdbc.driver.OracleDriver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

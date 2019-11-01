@@ -3,6 +3,7 @@ package lyw.demo.util;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import lyw.demo.pojo.Db_Connection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,16 +18,27 @@ public class StringUtil {
 
         String str = sql.substring(sql.indexOf("select") + 6,sql.indexOf("from")).trim();
 
+        if(str.equals("*")){
+
+        }
+
         String[] ss = str.split(",");
+
+
 
         return ss;
     }
 
-    public static String concatUrl(String db_type,String host,Integer port,String db_name){
+    public static String concatUrl(Db_Connection db_connection){
 
         String url = "";
 
         url += "jdbc:";
+
+        String db_type = db_connection.getDb_type();
+        String host = db_connection.getHost();
+        Integer port = db_connection.getPort();
+        String db_name = db_connection.getDb_name();
 
         switch (db_type){
             case "mysql": {
@@ -42,6 +54,12 @@ public class StringUtil {
                 url = url + ":" + port;
                 url = url + ";databaseName=" + db_name;
                 break;
+            }
+            case "oracle": {
+                url += "oracle:thin:@//";
+                url += host;
+                url = url + ":" + port;
+                url += "/orcl";
             }
         }
         return url;

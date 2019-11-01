@@ -21,14 +21,10 @@ public class SqlTaskServiceImpl implements SqlTaskService {
 
 
     @Override
-    public boolean CheckSqlRight(Db_Connection db_connection,String sql) {
+    public boolean CheckSqlRight(Db_Connection db_connection,String sql) throws SQLException {
         Connection connection = null;
-        try {
-            connection = JdbcUtils.getConnection(db_connection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+
+        connection = JdbcUtils.getConnection(db_connection);
 
         try {
             JdbcUtils.getResultSet(connection,sql);
@@ -37,6 +33,8 @@ public class SqlTaskServiceImpl implements SqlTaskService {
                 log.error(stackTraceElement.toString());
             }
             return false;
+        }finally {
+            JdbcUtils.close(connection,null,null);
         }
         return true;
     }
@@ -54,12 +52,8 @@ public class SqlTaskServiceImpl implements SqlTaskService {
     @Override
     public boolean CheckTableRight(String table, Db_Connection db_connection) throws SQLException {
         Connection connection = null;
-        try {
-            connection = JdbcUtils.getConnection(db_connection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+
+        connection = JdbcUtils.getConnection(db_connection);
 
         String sql = null;
         switch (db_connection.getDb_type()){
@@ -79,6 +73,8 @@ public class SqlTaskServiceImpl implements SqlTaskService {
                 if(o.toString().equals(table)) return false;
             }
         }
+
+        JdbcUtils.close(connection,null,null);
         return true;
     }
 
@@ -114,11 +110,10 @@ public class SqlTaskServiceImpl implements SqlTaskService {
                 create_sql += ")";
                 break;
             case "sqlServer":
-                create_sql += "CREATE TABLE ";
         }
 
-
-
         JdbcUtils.execute(connection,create_sql);
+
+        JdbcUtils.close(connection,null,null);
     }
 }

@@ -11,16 +11,11 @@ import java.util.List;
 public class JdbcUtils {
 
     public static Connection getConnection(Db_Connection db_connection) throws SQLException {
-        String source_name = db_connection.getDb_name();
-        Integer source_port = db_connection.getPort();
-        String source_host = db_connection.getHost();
-
         String username = db_connection.getUsername();
         String password = db_connection.getPassword();
-        String db_type = db_connection.getDb_type();
 
 //        ComboPooledDataSource comboPooledDataSource = new ComboPooledDataSource();
-        Connection connection = DriverManager.getConnection(StringUtil.concatUrl(db_type,source_host,source_port,source_name),username,password);
+        Connection connection = DriverManager.getConnection(StringUtil.concatUrl(db_connection),username,password);
         return connection;
     }
 
@@ -40,41 +35,35 @@ public class JdbcUtils {
             }
             objs.add(list);
         }
-
-        resultSet.close();
-        preparedStatement.close();
-        connection.close();
-
+        close(null,preparedStatement,resultSet);
         return objs;
     }
 
     public static void getResultSet(Connection connection,String sql) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ResultSet resultSet = preparedStatement.executeQuery();
-
-        if(resultSet != null) resultSet.close();
-        if(preparedStatement != null) preparedStatement.close();
-        if(connection != null) connection.close();
-
+        close(null,preparedStatement,resultSet);
     }
 
     public static void execute(Connection connection,String sql) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.execute();
-
-        if(preparedStatement != null) preparedStatement.close();
-        if(connection != null) connection.close();
+        preparedStatement.executeUpdate();
+        close(null,preparedStatement,null);
     }
 
-    public static void execute(Connection connection,String sql,List<Object> list) throws SQLException {
+    public static void execute(Connection connection,String sql,List<Object> list) throws SQLException,RuntimeException {
+        String s = null;
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
         for(int i = 1;i <= list.size();++i){
-            preparedStatement.setString(i,list.get(i-1).toString());
+            preparedStatement.setString(i,s = list.get(i-1)==null ? null : list.get(i-1).toString());
         }
-
         preparedStatement.executeUpdate();
+        close(null,preparedStatement,null);
+    }
 
+
+    public static void close(Connection connection,PreparedStatement preparedStatement,ResultSet resultSet) throws SQLException {
+        if(resultSet != null) resultSet.close();
         if(preparedStatement != null) preparedStatement.close();
         if(connection != null) connection.close();
     }

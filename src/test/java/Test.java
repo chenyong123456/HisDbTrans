@@ -24,7 +24,7 @@ public class Test {
 
     @org.junit.Test
     public void test1() {
-        System.out.println(StringUtil.concatUrl("sqlServer", "localhost", 3306, "test"));
+//        System.out.println(StringUtil.concatUrl("sqlServer", "localhost", 3306, "test"));
     }
 
     @org.junit.Test
