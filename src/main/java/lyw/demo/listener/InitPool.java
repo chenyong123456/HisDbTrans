@@ -1,6 +1,7 @@
 package lyw.demo.listener;
 
 import lombok.extern.slf4j.Slf4j;
+import lyw.demo.service.SqlTaskService;
 import lyw.demo.service.ThreadPool;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -18,5 +19,7 @@ public class InitPool implements ApplicationListener<ContextRefreshedEvent> {
             e.printStackTrace();
         }
         ThreadPool.init();
+        SqlTaskService sqlTaskService = event.getApplicationContext().getBean(SqlTaskService.class);
+        sqlTaskService.UpdateStatus();
     }
 }

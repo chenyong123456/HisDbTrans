@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import lyw.demo.mapper.DbConnectionMapper;
 import lyw.demo.pojo.Db_Connection;
 import lyw.demo.service.ConnectionService;
-import lyw.demo.util.JdbcUtils;
+import lyw.demo.service.JdbcService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class ConnectionServiceImpl implements ConnectionService {
+public class ConnectionServiceImpl extends JdbcService implements ConnectionService {
 
     
     @Autowired
@@ -24,7 +24,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     public boolean checkConnection(Db_Connection db_connection) {
         Connection connection = null;
         try {
-            connection = JdbcUtils.getConnection(db_connection);
+            connection = getConnection(db_connection);
         } catch (SQLException e) {
             e.printStackTrace();
             for (StackTraceElement stackTraceElement : e.getStackTrace()) {
@@ -48,9 +48,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public boolean keepConnection(Db_Connection db_connection) {
         if(dbConnectionMapper.selectByPrimaryKey(db_connection.getName()) != null) return false;
-
         dbConnectionMapper.insertSelective(db_connection);
-
         return true;
     }
 
@@ -70,4 +68,6 @@ public class ConnectionServiceImpl implements ConnectionService {
         Db_Connection db_connection = dbConnectionMapper.selectByPrimaryKey(name);
         return db_connection;
     }
+
+
 }

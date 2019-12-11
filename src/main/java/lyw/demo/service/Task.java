@@ -4,24 +4,20 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import lyw.demo.pojo.Sql_Task;
 import lyw.demo.util.JdbcUtils;
-import lyw.demo.util.StringUtil;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 @Data
 @Slf4j
-public class Task implements Runnable{
+public class Task extends JdbcService implements Runnable{
 
     private Sql_Task sql_task;
-
-    private List<Class> classes;
 
     @Override
     public void run() {
         try {
-            Connection targetConn = JdbcUtils.getConnection(sql_task.getTarget_conn());
+            Connection targetConn = getConnection(sql_task.getTarget_conn());
 
             //删除表所有数据
             String delete_sql = "";
@@ -29,11 +25,11 @@ public class Task implements Runnable{
             JdbcUtils.execute(targetConn,delete_sql);
 
             //查询源表数据
-            Connection sourceConn = JdbcUtils.getConnection(sql_task.getSource_conn());
-            List<List<Object>> list = JdbcUtils.getResult(sql_task.getSql(),sourceConn,sql_task.getSource_conn().getDb_type());
+            Connection sourceConn = getConnection(sql_task.getSource_conn());
+            List<List<Object>> list = getResult(sql_task.getSource_conn(),sql_task.getT_sql());
             JdbcUtils.close(sourceConn,null,null);
 
-            String[] ss = StringUtil.concatSql(sql_task.getSql());
+            String[] ss = concatSql(sql_task.getT_sql(),sql_task.getSource_conn());
 
             String sql = "insert into " + sql_task.getNew_table() + " values(";
 
@@ -47,25 +43,18 @@ public class Task implements Runnable{
             for(List<Object> objectList : list){
                 JdbcUtils.execute(targetConn,sql,objectList);
             }
-            System.out.println(sql_task.getSql() + "执行");
+            log.info(sql_task.getT_sql() + "执行");
             JdbcUtils.close(targetConn,null,null);
-
-
-        } catch (SQLException e) {
+            if(sql_task.getType().equals("运行一次")){
+                ThreadPool.remove(sql_task.getT_sql());
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            log.error("移出任务" + sql_task.getSql());
-            ThreadPool.remove(sql_task.getSql());
-        }catch (RuntimeException e){
-            e.printStackTrace();
+            log.error("移出任务" + sql_task.getT_sql());
+            ThreadPool.remove(sql_task.getT_sql());
         }
     }
 
-    private void setClasses(List<Object> list){
-        list.forEach(o -> {
-            if(o instanceof Double) classes.add(Double.class);
-            else if(o instanceof Integer) classes.add(Integer.class);
-            else if(o instanceof Float) classes.add(Float.class);
-        });
-    }
+
 
 }
