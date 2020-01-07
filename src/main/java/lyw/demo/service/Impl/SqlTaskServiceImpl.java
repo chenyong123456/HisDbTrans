@@ -3,7 +3,6 @@ package lyw.demo.service.Impl;
 import lombok.extern.slf4j.Slf4j;
 import lyw.demo.mapper.DbConnectionMapper;
 import lyw.demo.mapper.SqlTaskMapper;
-import lyw.demo.pojo.Column;
 import lyw.demo.pojo.Db_Connection;
 import lyw.demo.pojo.Sql_Task;
 import lyw.demo.service.JdbcService;
@@ -14,7 +13,6 @@ import lyw.demo.util.JdbcUtils;
 import net.sf.jsqlparser.JSQLParserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -35,8 +33,8 @@ public class SqlTaskServiceImpl extends JdbcService implements SqlTaskService {
 
         //解析sql得到查询的字段 判断查询字段与需要字段是否相同
         String[] ss = concatSql(sql_task.getT_sql(),sql_task.getSource_conn());
-        List<Column> columns = sql_task.getColumns();
-        if(ss.length != columns.size()) return false;
+        //List<Column> columns = sql_task.getColumns();
+        //if(ss.length != columns.size()) return false;
 
         try {
             JdbcUtils.getResultSet(connection,sql_task.getT_sql());
@@ -107,7 +105,7 @@ public class SqlTaskServiceImpl extends JdbcService implements SqlTaskService {
     public void createTable(Sql_Task sql_task) throws SQLException {
         Connection connection = getConnection(sql_task.getTarget_conn());
 
-        List<Column> columns = sql_task.getColumns();
+        ///List<Column> columns = sql_task.getColumns();
 
         String create_sql = "";
 
@@ -126,11 +124,11 @@ public class SqlTaskServiceImpl extends JdbcService implements SqlTaskService {
 //                    create_sql = create_sql + "`" + s + "`" + " varchar(255) NULL";
 //                }
 
-                for(Column column : columns){
+              /*  //for(Column column : columns){
                     if(flag) flag = false;
                     else create_sql = create_sql + ",";
                     create_sql = create_sql + "`" + column.getColumn_name() + "` " + column.getColumn_type();
-                }
+                }*/
 
                 create_sql += ")";
                 break;

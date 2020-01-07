@@ -29,7 +29,6 @@ public class Sql_Task {
 
     private String status;
 
-    @Transient
-    private List<Column> columns;
+
 
 }
